@@ -1,5 +1,6 @@
 ﻿using POCAttribute.Models;
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace POCAttribute
@@ -10,6 +11,9 @@ namespace POCAttribute
             FilePath = @"C:\Proj\HackathonVALIA\src\POCAttribute\POCAttribute\Sample Files\example.txt";
         static void Main(string[] args)
         {
+            var culture = new CultureInfo("pt-BR");
+            CultureInfo.CurrentCulture = culture;
+
             string line;
             StreamReader file = new StreamReader(FilePath);
 
@@ -17,8 +21,6 @@ namespace POCAttribute
             {
                 Empregado empregado = new Empregado(line);
                 Console.WriteLine(empregado.Nome);
-                Console.WriteLine();
-                Console.WriteLine(empregado.Matricula);
                 Console.WriteLine();
                 Console.WriteLine(empregado.DataNascimento);
                 Console.WriteLine();
