@@ -10,14 +10,12 @@ namespace POCAttribute.Models.ElementAttribute
     [Serializable]
     public abstract class BaseAttribute : Attribute
     {
-        public int Line { get; private set; }
         public int InitialPosition { get; private set; }
         public int Length { get; private set; }
         public bool Required { get; private set; }
 
-        public BaseAttribute(int line, int initialPosition, int length, bool required)
+        public BaseAttribute(int initialPosition, int length, bool required)
         {
-            this.Line = line;
             this.InitialPosition = initialPosition;
             this.Length = length;
             this.Required = required;

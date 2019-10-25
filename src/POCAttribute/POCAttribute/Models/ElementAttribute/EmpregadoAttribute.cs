@@ -12,8 +12,8 @@ namespace POCAttribute.Models.ElementAttribute
     [Serializable]
     public class EmpregadoAttribute : BaseAttribute
     {
-        public EmpregadoAttribute(int line, int initialPosition, int length, bool required) 
-            : base(line, initialPosition, length, required)
+        public EmpregadoAttribute(int initialPosition, int length, bool required) 
+            : base(initialPosition, length, required)
         {
         }
     }
