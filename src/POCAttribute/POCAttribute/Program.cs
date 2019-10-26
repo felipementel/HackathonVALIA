@@ -1,33 +1,72 @@
-﻿using POCAttribute.Models;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using POCAttribute.Models;
 using System;
-using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace POCAttribute
 {
     class Program
     {
-        private static readonly string 
-            FilePath = @"C:\Proj\HackathonVALIA\src\POCAttribute\POCAttribute\Sample Files\example.txt";
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var culture = new CultureInfo("pt-BR");
-            CultureInfo.CurrentCulture = culture;
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+            var config = builder.Build();
 
-            string line;
-            StreamReader file = new StreamReader(FilePath);
+            TelemetryConfiguration telemetryConfig = TelemetryConfiguration.CreateDefault();
+            telemetryConfig.InstrumentationKey = config.GetSection("ApplicationInsights:InstrumentationKey").Value;
+            TelemetryClient telemetryClient = new TelemetryClient(telemetryConfig);
 
-            while ((line = file.ReadLine()) != null)
+            try
             {
-                Empregado empregado = new Empregado(line);
-                Console.WriteLine(empregado.Nome);
-                Console.WriteLine();
-                Console.WriteLine(empregado.DataNascimento);
-                Console.WriteLine();
-            }
+                Setup.SetCulture();
 
-            file.Close();
-            Console.ReadKey();
+                AzureFileStorageClient fileStorageClient = new AzureFileStorageClient();
+                await fileStorageClient.DownloadFile();
+
+                //if (Directory.Exists(config["FilesDirectory"]))
+                //{
+                //    DirectoryInfo dirInfo = new DirectoryInfo(config["FilesDirectory"]);
+                //    foreach (string filePath in Directory.EnumerateFiles(config["FilesDirectory"], "*.txt"))
+                //    {
+                //        var lines = File.ReadLines(filePath);
+                //        int lineCount = lines.Count();
+                //        int count = 0;
+                //        bool isContent;
+                //        if (lineCount > 2)
+                //        {
+                //            foreach (string line in lines)
+                //            {
+                //                count++;
+                //                isContent = (count > 1 && count < lineCount);
+
+                //                if (isContent)
+                //                {
+                //                    Empregado empregado = new Empregado(line, count);
+                //                    Console.WriteLine(string.Format("Fim do processamento da linha {0}", count));
+                //                }
+                //            }
+                //            Console.WriteLine("Fim do processamento do arquivo \"{0}\"", filePath);
+                //        }
+                //        else
+                //        {
+                //            throw new FileLoadException("O arquivo não pode ser processado pois deve conter no mínimo três linhas: header, conteúdo e trailer.");
+                //        }
+                //    }
+                //}
+
+                Console.ReadKey();
+            }
+            catch (Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+            }
         }
     }
 }
